@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>数据导入</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="head">
+        <h1 id="heading">数据导入</h1>
+        <p id="lead" class="lead">
+          上传老插件导出的签到 JSON。导入只新增数据：等级只升不降，签到记录按日期去重，龟龟币按历史记录补发。
+        </p>
+      </header>
+
+      <section class="card">
+        <div id="drop" class="drop">
+          <p id="dropText">把 JSON 文件拖到这里，或</p>
+          <label class="button" for="file">选择 JSON 文件</label>
+          <input id="file" type="file" accept="application/json,.json" hidden />
+        </div>
+        <p id="status" class="status" hidden></p>
+      </section>
+
+      <section id="previewCard" class="card" hidden>
+        <div class="card-head">
+          <h2 id="previewTitle">预览</h2>
+          <span id="previewFile" class="muted"></span>
+        </div>
+        <dl id="previewStats" class="stats"></dl>
+        <div id="previewIssues" class="issues" hidden></div>
+        <div class="actions">
+          <button id="apply" class="button primary" type="button">确认导入</button>
+          <button id="cancel" class="button" type="button">取消</button>
+        </div>
+      </section>
+
+      <section id="reportCard" class="card" hidden>
+        <div class="card-head">
+          <h2 id="reportTitle">导入完成</h2>
+          <span id="reportFile" class="muted"></span>
+        </div>
+        <dl id="reportStats" class="stats"></dl>
+        <div id="reportIssues" class="issues" hidden></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2 id="pendingTitle">待导入文件</h2>
+          <button id="refresh" class="button small" type="button">刷新</button>
+        </div>
+        <ul id="pending" class="files"></ul>
+      </section>
+
+      <section id="lastCard" class="card" hidden>
+        <div class="card-head">
+          <h2 id="lastTitle">上次导入</h2>
+        </div>
+        <dl id="lastStats" class="stats"></dl>
+      </section>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

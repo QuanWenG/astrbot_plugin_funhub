@@ -1,0 +1,351 @@
+{
+  "access": {
+    "description": "白名单与生效范围",
+    "type": "object",
+    "items": {
+      "group_whitelist": {
+        "description": "群聊白名单",
+        "type": "list",
+        "items": { "type": "string" },
+        "default": [],
+        "hint": "只有这些群聊里的消息会被处理。可填裸群号（123456）、平台前缀（aiocqhttp:123456）或完整 UMO。留空表示所有群都不生效——插件会完全静默，这是最容易误判成「插件坏了」的一项。"
+      }
+    }
+  },
+  "checkin": {
+    "description": "签到规则",
+    "type": "object",
+    "items": {
+      "timezone": {
+        "description": "结算时区",
+        "type": "string",
+        "default": "Asia/Hong_Kong",
+        "hint": "连签按此时区的「一天」计算。Windows 上若缺 tzdata 会自动回退系统本地时区并写日志。"
+      },
+      "day_reset_hour": {
+        "description": "每日重置时刻",
+        "type": "int",
+        "default": 4,
+        "slider": { "min": 0, "max": 23, "step": 1 },
+        "hint": "默认凌晨 4 点换日：3:59 签到仍算前一天。"
+      },
+      "auto_checkin": {
+        "description": "当天首条群消息自动签到",
+        "type": "bool",
+        "default": true,
+        "hint": "开启后，白名单群里每人每天的第一条消息会自动完成签到（被 @ 或带唤醒前缀的消息照常签到，只是不抢话）。"
+      },
+      "auto_checkin_reply": {
+        "description": "自动签到如何出声",
+        "type": "string",
+        "options": ["always", "cycle", "silent"],
+        "labels": ["每次都回签到卡", "只有周期奖励时出声", "完全静默"],
+        "default": "always",
+        "hint": "always：与老插件一致，签到立刻可见；cycle：只在连签满 7 / 30 天时出声，平时安静；silent：只入库不回复（无论哪种都会写一条 INFO 日志便于核对）。"
+      }
+    }
+  },
+  "coins": {
+    "description": "龟龟币奖励（100 币 ≈ 1 元，仅用于标定数值量级）",
+    "type": "object",
+    "items": {
+      "base_reward": {
+        "description": "基础奖",
+        "type": "int",
+        "default": 100,
+        "slider": { "min": 0, "max": 1000, "step": 10 }
+      },
+      "random_bonus_max": {
+        "description": "随机奖上限",
+        "type": "int",
+        "default": 50,
+        "slider": { "min": 0, "max": 500, "step": 10 },
+        "hint": "每次签到随机获得 0 ~ 该值的币。导入补发时按期望值（该值的一半）计算，保证结果可复现。"
+      },
+      "streak_bonus_per_day": {
+        "description": "连签加成（每天）",
+        "type": "int",
+        "default": 10,
+        "slider": { "min": 0, "max": 200, "step": 5 }
+      },
+      "streak_bonus_cap_days": {
+        "description": "连签加成封顶天数",
+        "type": "int",
+        "default": 15,
+        "slider": { "min": 0, "max": 365, "step": 1 },
+        "hint": "连签加成 = min(连签天数-1, 该值) × 每天加成。"
+      },
+      "cycle_short_days": {
+        "description": "短周期天数",
+        "type": "int",
+        "default": 7,
+        "slider": { "min": 1, "max": 365, "step": 1 },
+        "hint": "连签天数是 7 的倍数时发放短周期奖，之后每 7 天循环一次。必须小于长周期天数。"
+      },
+      "cycle_short_bonus": {
+        "description": "短周期奖励",
+        "type": "int",
+        "default": 300,
+        "slider": { "min": 0, "max": 10000, "step": 50 }
+      },
+      "cycle_long_days": {
+        "description": "长周期天数",
+        "type": "int",
+        "default": 30,
+        "slider": { "min": 1, "max": 3650, "step": 1 },
+        "hint": "连签天数是 30 的倍数时发放长周期奖，之后每 30 天循环一次，与短周期独立判定、可叠加。"
+      },
+      "cycle_long_bonus": {
+        "description": "长周期奖励",
+        "type": "int",
+        "default": 1500,
+        "slider": { "min": 0, "max": 100000, "step": 100 }
+      },
+      "first_checkin_bonus": {
+        "description": "首次签到礼",
+        "type": "int",
+        "default": 200,
+        "slider": { "min": 0, "max": 10000, "step": 50 },
+        "hint": "只在玩家第一次签到时发放；导入补发历史记录时不含这一项。"
+      }
+    }
+  },
+  "levels": {
+    "description": "等级",
+    "type": "object",
+    "items": {
+      "max_level": {
+        "description": "等级上限",
+        "type": "int",
+        "default": 100,
+        "slider": { "min": 1, "max": 1000, "step": 1 },
+        "hint": "等级只由导入写入，签到不会改变等级；该值用于裁剪导入数据里的异常等级。"
+      }
+    }
+  },
+  "import": {
+    "description": "老插件数据导入",
+    "type": "object",
+    "items": {
+      "default_platform": {
+        "description": "缺省平台",
+        "type": "string",
+        "default": "aiocqhttp",
+        "hint": "导出数据里缺少 platform 字段时使用。"
+      },
+      "backfill_coins": {
+        "description": "按历史记录补发龟龟币",
+        "type": "bool",
+        "default": true,
+        "hint": "导入时把每条历史签到按当前公式折算成龟龟币发给玩家（随机奖取期望值）。只补发新插入的记录，重复导入不会二次发币。"
+      },
+      "max_file_mb": {
+        "description": "上传文件上限（MB）",
+        "type": "int",
+        "default": 20,
+        "slider": { "min": 1, "max": 512, "step": 1 }
+      }
+    }
+  },
+  "ui": {
+    "description": "展示",
+    "type": "object",
+    "items": {
+      "ranking_size": {
+        "description": "排行显示条数",
+        "type": "int",
+        "default": 10,
+        "slider": { "min": 1, "max": 50, "step": 1 }
+      }
+    }
+  },
+  "duel": {
+    "description": "决斗（一轮定胜负，无冷却）",
+    "type": "object",
+    "items": {
+      "enabled": {
+        "description": "启用决斗",
+        "type": "bool",
+        "default": true
+      },
+      "dice_max": {
+        "description": "掷点上限",
+        "type": "int",
+        "default": 100,
+        "slider": { "min": 1, "max": 10000, "step": 1 },
+        "hint": "双方各掷一个 0 ~ 该值的随机数，谁大谁赢；点数相同就加赛，直到分出胜负（没有平局）。"
+      },
+      "stake_max": {
+        "description": "基础赔付上限",
+        "type": "int",
+        "default": 500,
+        "slider": { "min": 0, "max": 100000, "step": 50 },
+        "hint": "败者赔付 0 ~ 该值的随机币，再乘上倍率（存款碾压 + 管理员败北）。按「尽所能」结算：余额不够就全给，不会因为穷而免罚。"
+      },
+      "mute_seconds": {
+        "description": "禁言时长（秒）",
+        "type": "int",
+        "default": 60,
+        "slider": { "min": 1, "max": 2592000, "step": 1 },
+        "hint": "机器人是群管理员时，主动挑事却输掉的一方会被禁言这么久（被打的人不会被禁言）。QQ 官方机器人最多 30 天。"
+      },
+      "rich_step_coins": {
+        "description": "存款碾压：每一档的币数",
+        "type": "int",
+        "default": 500,
+        "slider": { "min": 1, "max": 100000, "step": 100 },
+        "hint": "败者存款每比胜者多这么多币，就多赔一档。"
+      },
+      "rich_step_percent": {
+        "description": "存款碾压：每一档多赔 %",
+        "type": "int",
+        "default": 10,
+        "slider": { "min": 0, "max": 100, "step": 1 },
+        "hint": "与上一项配合：每多 500 币 → 多赔 10%。"
+      },
+      "rich_cap_percent": {
+        "description": "存款碾压：封顶 %",
+        "type": "int",
+        "default": 50,
+        "slider": { "min": 0, "max": 1000, "step": 10 },
+        "hint": "存款碾压最多加这么多（默认 50%，所以普通人最多赔 1.5 倍）。"
+      },
+      "admin_percent": {
+        "description": "管理员败北：倍率再加 %",
+        "type": "int",
+        "default": 20,
+        "slider": { "min": 0, "max": 1000, "step": 10 },
+        "hint": "败者是群主 / 管理员时（平台不允许禁言他们），在普通人算出来的倍率上再加 0.2 倍 —— 是加数不是固定倍率，所以管理员最多赔 1.7 倍。"
+      }
+    }
+  },
+  "roulette": {
+    "description": "龟龟轮盘（若干弹槽 1 颗子弹，谁扣扳机谁可能中弹）",
+    "type": "object",
+    "items": {
+      "enabled": {
+        "description": "启用轮盘",
+        "type": "bool",
+        "default": true
+      },
+      "chambers": {
+        "description": "弹槽数",
+        "type": "int",
+        "default": 6,
+        "slider": { "min": 1, "max": 100, "step": 1 },
+        "hint": "开局就定好子弹在第几个弹槽，所以第几枪响是确定的；一直开就是赌命。"
+      },
+      "safe_reward": {
+        "description": "第一枪的空枪奖励",
+        "type": "int",
+        "default": 50,
+        "slider": { "min": 0, "max": 100000, "step": 10 },
+        "hint": "第一枪空枪发这么多龟龟币（系统发放），越往后开枪越肥。"
+      },
+      "safe_reward_step": {
+        "description": "每多开一枪再加多少",
+        "type": "int",
+        "default": 50,
+        "slider": { "min": 0, "max": 100000, "step": 10 },
+        "hint": "第 n 枪的空枪奖励 = 第一枪奖励 + (n-1) × 这个值：50 / 100 / 150 …"
+      },
+      "hit_penalty": {
+        "description": "中弹赔付",
+        "type": "int",
+        "default": 500,
+        "slider": { "min": 0, "max": 1000000, "step": 50 },
+        "hint": "中弹的人扣这么多龟龟币（按「尽所能」：余额不够就全给）。只禁言不踢人。"
+      },
+      "share_percent": {
+        "description": "中弹赔付分给开枪者的比例 %",
+        "type": "int",
+        "default": 100,
+        "slider": { "min": 0, "max": 100, "step": 10 },
+        "hint": "扣款里这个比例平分给本局其他开过枪的人（中弹的人和只发起没开枪的不分），剩下的回收（不增发）。"
+      },
+      "misfire_percent": {
+        "description": "炸膛概率 %",
+        "type": "float",
+        "default": 25,
+        "slider": { "min": 0, "max": 100, "step": 5 },
+        "hint": "抽到子弹的那一枪（子弹在第几个弹槽就第几枪）有这么多概率炸膛：开枪的人不中弹，反而白拿下面那笔钱，本局结束。填 0 表示那一枪必定中弹。"
+      },
+      "misfire_reward": {
+        "description": "炸膛白拿多少",
+        "type": "int",
+        "default": 500,
+        "slider": { "min": 0, "max": 1000000, "step": 50 },
+        "hint": "炸膛时给开枪的人发这么多龟龟币（系统发放）。填 0 表示只免除中弹、不发钱。"
+      },
+      "drunk_extra_max": {
+        "description": "醉酒时多拉几个人陪罚",
+        "type": "int",
+        "default": 2,
+        "slider": { "min": 0, "max": 10, "step": 1 },
+        "hint": "群里喝醉时走火，中弹的人会连带 1 ~ 该值 名同局开过枪的人一起受罚（照搬原版「醉酒随机命中多人」）。赔的钱分给没中弹的开枪者。填 0 表示关掉这个联动。"
+      },
+      "drunk_extra_percent": {
+        "description": "醉酒时走火的概率 %",
+        "type": "float",
+        "default": 25,
+        "slider": { "min": 0, "max": 100, "step": 5 },
+        "hint": "喝醉只是前提：还要按这个概率走火，走火了才会连带别人（默认 25%）。填 100 就是「醉了必走火」（原版行为）。"
+      },
+      "mute_seconds": {
+        "description": "中弹禁言时长（秒）",
+        "type": "int",
+        "default": 60,
+        "slider": { "min": 0, "max": 2592000, "step": 60 },
+        "hint": "中弹的人被禁言这么久（默认 60 秒）；群主 / 管理员禁不了言，只扣币。填 0 表示只扣币。"
+      },
+      "timeout_seconds": {
+        "description": "本局超时（秒）",
+        "type": "int",
+        "default": 300,
+        "slider": { "min": 30, "max": 86400, "step": 30 },
+        "hint": "这么久没人开枪，本局自动作废，可以重新开局。"
+      },
+      "rescue_fail_percent": {
+        "description": "救援失败概率 %",
+        "type": "float",
+        "default": 12.5,
+        "slider": { "min": 0, "max": 100, "step": 0.5 },
+        "hint": "/救一下 有这么多概率失败，救不出人来。"
+      },
+      "judgment_seconds": {
+        "description": "补一枪追加禁言（秒）",
+        "type": "int",
+        "default": 60,
+        "slider": { "min": 0, "max": 2592000, "step": 60 },
+        "hint": "/补一枪 成功时给中弹被禁言的人再加这么久（在原有禁言上叠加）。填 0 表示补一枪只走个过场。"
+      },
+      "judgment_fail_percent": {
+        "description": "补一枪卡壳概率 %",
+        "type": "float",
+        "default": 12.5,
+        "slider": { "min": 0, "max": 100, "step": 0.5 },
+        "hint": "/补一枪 有这么多概率卡壳：什么都不发生（照搬原插件的 fail_prob）。"
+      },
+      "judgment_backfire_percent": {
+        "description": "补一枪反噬概率 %",
+        "type": "float",
+        "default": 12.5,
+        "slider": { "min": 0, "max": 100, "step": 0.5 },
+        "hint": "/补一枪 有这么多概率反噬：这一枪补到发起者自己头上（原版是醉酒时的 20%）。"
+      },
+      "judgment_backfire_drunk_only": {
+        "description": "反噬只在醉酒时触发",
+        "type": "bool",
+        "default": true,
+        "hint": "照搬原版：只有群里喝醉（喝酒状态从 astrbot_plugin_repeater 读）才可能翻车，清醒时补一枪没有风险。关掉则任何时候都按上面的概率反噬；没装喝酒插件时也建议关掉，否则永远不会反噬。"
+      },
+      "action_cooldown_seconds": {
+        "description": "补枪 / 救人的冷却（秒）",
+        "type": "int",
+        "default": 60,
+        "slider": { "min": 0, "max": 3600, "step": 30 },
+        "hint": "同一个人不能连着补枪、也不能连着救人：这么久的冷却**按人 + 按操作**各算一份，成功失败都算（卡壳、炸膛、救失败一样要等，免得一直刷到成功）。补枪和救人之间不互斥，多人也可以轮流救同一个人。填 0 表示不管。"
+      }
+    }
+  }
+}

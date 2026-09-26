@@ -205,3 +205,6 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# 本仓库测试用的临时目录（见 tests/conftest.py）
+.pytest-tmp/

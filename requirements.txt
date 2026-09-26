@@ -1,0 +1,3 @@
+# 只依赖 Python 标准库与 AstrBot 自带的 aiosqlite（AstrBot 的 pyproject 已声明
+# aiosqlite>=0.21.0），这里显式列出以免宿主版本变化时静默失效。
+aiosqlite>=0.21.0

@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "source": "checkin-records",
+  "exported_at": "2026-01-05T10:00:00",
+  "checkin_day_reset_hour": 4,
+  "user_count": 4,
+  "checkin_count": 6,
+  "users": [
+    {
+      "user_pk": 1,
+      "platform": "aiocqhttp",
+      "group_id": "100",
+      "user_id": "200",
+      "nickname": "龟甲",
+      "level": 12,
+      "exp": 34,
+      "total_exp": 5678,
+      "checkin_total": 3,
+      "checkins": [
+        {
+          "date": "2026-01-01",
+          "streak_days": 1,
+          "exp_gain": 20,
+          "created_at": "2026-01-01T12:00:00"
+        },
+        {
+          "date": "2026-01-02",
+          "streak_days": 2,
+          "exp_gain": 22,
+          "created_at": "2026-01-02T12:00:00"
+        },
+        {
+          "date": "2026-01-03",
+          "streak_days": 7,
+          "exp_gain": 40,
+          "created_at": "2026-01-03T12:00:00"
+        }
+      ],
+      "created_at": "2025-12-31T00:00:00",
+      "updated_at": "2026-01-03T12:00:00"
+    },
+    {
+      "user_pk": 2,
+      "platform": "aiocqhttp",
+      "group_id": "100",
+      "user_id": "201",
+      "nickname": "",
+      "level": 150,
+      "exp": 0,
+      "total_exp": 0,
+      "checkin_total": 2,
+      "checkins": [
+        {
+          "date": "2026-01-04",
+          "streak_days": 30,
+          "exp_gain": 50,
+          "created_at": "2026-01-04T12:00:00"
+        },
+        {
+          "date": "2026-01-04",
+          "streak_days": 30,
+          "exp_gain": 50,
+          "created_at": "2026-01-04T12:00:00"
+        }
+      ],
+      "legacy_extra": { "note": "未知字段应被忽略" }
+    },
+    {
+      "user_pk": 3,
+      "platform": "telegram",
+      "group_id": "-500",
+      "user_id": "300",
+      "nickname": "龟丙",
+      "level": 3,
+      "checkins": [
+        { "date": "2025-12-30", "exp_gain": 10 },
+        { "date": "2025-13-40", "streak_days": 3, "exp_gain": 10 },
+        { "date": "不是日期", "streak_days": 1 },
+        "这不是对象"
+      ]
+    },
+    {
+      "user_pk": 4,
+      "platform": "aiocqhttp",
+      "group_id": "100",
+      "nickname": "没有 user_id 的记录",
+      "level": 9
+    }
+  ]
+}

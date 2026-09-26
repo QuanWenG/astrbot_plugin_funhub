@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "display_name": "龟龟乐园",
+    "short_desc": "群聊签到与龟龟币",
+    "desc": "群聊签到与龟龟币：连签满 7 / 30 天有周期奖励，支持导入老插件 LevelUpPvp 的等级与签到记录并补发龟龟币。"
+  },
+  "pages": {
+    "import": {
+      "title": "数据导入",
+      "description": "上传老插件导出的签到 JSON，预览确认后导入并补发龟龟币。",
+      "heading": "数据导入",
+      "lead": "上传老插件 astrbot_plugin_LevelUpPvp 导出的签到 JSON。导入只新增数据：等级只升不降，签到记录按日期去重，龟龟币按历史记录补发。",
+      "pick": "选择 JSON 文件",
+      "drop": "也可以把文件拖到这里",
+      "previewTitle": "预览",
+      "apply": "确认导入",
+      "cancel": "取消",
+      "pendingTitle": "待导入文件",
+      "pendingEmpty": "import/ 目录里还没有 JSON 文件。",
+      "lastTitle": "上次导入",
+      "preview": "预览",
+      "import": "导入",
+      "refresh": "刷新",
+      "playersNew": "新玩家",
+      "playersUpdated": "更新玩家",
+      "checkinsInserted": "新增签到记录",
+      "checkinsSkipped": "已存在记录",
+      "coinsGranted": "补发龟龟币",
+      "coinsPlayers": "受补发玩家",
+      "errors": "异常",
+      "warnings": "提示",
+      "dryRun": "预览（未写入数据库）"
+    }
+  }
+}
